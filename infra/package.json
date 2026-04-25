@@ -1,0 +1,19 @@
+{
+  "name": "gateway",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "22.x",
+    "aws-cdk": "^2.1119.0",
+    "typescript": "~5.x"
+  },
+  "dependencies": {
+    "@aws/agentcore-cdk": "^0.1.0-alpha.22",
+    "aws-cdk-lib": "^2.251.0",
+    "constructs": "^10.0.0"
+  }
+}

@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+node_modules
+
+# 環境変数（APIキー・エンドポイント等を含む可能性があるためコミット対象外）
+.env.local
+.env*.local
+
+# Claude Code ローカル設定
+.claude/
