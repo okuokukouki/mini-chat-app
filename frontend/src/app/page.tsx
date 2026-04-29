@@ -160,7 +160,7 @@ export default function ChatPage() {
 
       // AgentCore Runtime のエンドポイントは /invocations
       // リクエストボディは { prompt, session_id }
-      const response = await fetch(`${API_URL}/invocations`, {
+      const response = await fetch(`${API_URL}/invocations?qualifier=DEFAULT`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -74,8 +74,16 @@ export class RuntimeStack extends cdk.Stack {
     );
 
     // Runtime エンドポイント URL を SSM に保存（フロントエンドが参照）
-    // URL 形式: https://<runtimeId>.runtime.bedrock-agentcore.<region>.amazonaws.com
-    const runtimeEndpointUrl = `https://${env.runtime.runtimeId}.runtime.bedrock-agentcore.${this.region}.amazonaws.com`;
+    // runtimeId にアンダースコアが含まれ DNS ホスト名として無効なため、ARN をパスに URL エンコードする形式を使用
+    // 形式: https://bedrock-agentcore.<region>.amazonaws.com/runtimes/<encodedArn>
+    const colonReplaced = cdk.Fn.join('%3A', cdk.Fn.split(':', env.runtime.runtimeArn));
+    const encodedArn = cdk.Fn.join('%2F', cdk.Fn.split('/', colonReplaced));
+    const runtimeEndpointUrl = cdk.Fn.join('', [
+      'https://bedrock-agentcore.',
+      this.region,
+      '.amazonaws.com/runtimes/',
+      encodedArn,
+    ]);
 
     new ssm.StringParameter(this, 'RuntimeEndpointParam', {
       parameterName: '/mini-chat-app/runtime-endpoint',

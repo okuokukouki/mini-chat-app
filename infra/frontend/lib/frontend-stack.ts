@@ -10,8 +10,10 @@ import { Construct } from 'constructs';
 // Entra ID アプリ登録情報（フロントエンド環境変数として渡す）
 const ENTRA_CLIENT_ID = '4f499ada-09c5-4a58-9c27-356250c69333';
 const ENTRA_TENANT_ID = '32b23daa-137d-4054-b9b3-674e256f7a7e';
+// ARN を URL エンコードしたパスベースのエンドポイント（アンダースコアを DNS ホスト名に使えないため）
+// ARN: arn:aws:bedrock-agentcore:us-east-1:255260635968:runtime/miniChatApp_miniChatApp-YHOiZF9NbB
 const AGENTCORE_ENDPOINT =
-  'https://miniChatApp_miniChatApp-YHOiZF9NbB.runtime.bedrock-agentcore.us-east-1.amazonaws.com';
+  'https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%3Aus-east-1%3A255260635968%3Aruntime%2FminiChatApp_miniChatApp-YHOiZF9NbB';
 
 export class FrontendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
