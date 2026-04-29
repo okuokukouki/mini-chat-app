@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as bedrockagentcore from 'aws-cdk-lib/aws-bedrockagentcore';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { IamStack } from './iam-stack';
 
@@ -105,9 +106,18 @@ export class GatewayStack extends cdk.Stack {
       },
     });
 
+    const gatewayUrl = `https://${gateway.attrGatewayIdentifier}.gateway.bedrock-agentcore.${this.region}.amazonaws.com/mcp`;
+
+    // Gateway URL を SSM に保存（Runtime が起動時に参照する）
+    new ssm.StringParameter(this, 'GatewayEndpointParam', {
+      parameterName: '/mini-chat-app/gateway-endpoint',
+      stringValue: gatewayUrl,
+      description: 'AgentCore Gateway endpoint URL',
+    });
+
     new cdk.CfnOutput(this, 'GatewayId', { value: gateway.attrGatewayIdentifier });
     new cdk.CfnOutput(this, 'GatewayUrl', {
-      value: `https://${gateway.attrGatewayIdentifier}.gateway.bedrock-agentcore.${this.region}.amazonaws.com/mcp`,
+      value: gatewayUrl,
       exportName: 'MiniChatGatewayUrl',
     });
   }

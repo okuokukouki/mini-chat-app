@@ -65,11 +65,27 @@ export class RuntimeStack extends cdk.Stack {
       throw new Error('AgentCoreApplication に miniChatApp 環境が見つかりません。');
     }
 
-    // Secrets Manager 読み取り権限を追加（Tavily API キー）
+    // Secrets Manager 読み取り権限（Tavily API キー / Google OAuth）
     env.runtime.addToPolicy(
       new iam.PolicyStatement({
         actions: ['secretsmanager:GetSecretValue'],
         resources: [`arn:aws:secretsmanager:${this.region}:${this.account}:secret:mini-chat-app/*`],
+      }),
+    );
+
+    // SSM 読み取り権限（Gateway エンドポイント URL を起動時に取得）
+    env.runtime.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['ssm:GetParameter'],
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/mini-chat-app/*`],
+      }),
+    );
+
+    // AgentCore ビルトインツール権限（Code Interpreter / Browser）
+    env.runtime.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['bedrock-agentcore:*'],
+        resources: ['*'],
       }),
     );
 

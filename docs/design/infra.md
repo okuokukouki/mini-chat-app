@@ -112,8 +112,11 @@ flowchart LR
 | Gateway Target | `tavily-search___tavily_search`（検索） |
 | Gateway Target | `tavily-search___tavily_extract`（URL 取得） |
 
-**出力**:
-- `GatewayUrl`（GATEWAY_ENDPOINT として使用）
+**SSM 出力**:
+- `/mini-chat-app/gateway-endpoint`（Runtime が起動時に参照）
+
+**CloudFormation 出力**:
+- `GatewayUrl`
 
 ---
 
@@ -154,6 +157,16 @@ flowchart LR
 - `ENTRA_TENANT_ID`: `32b23daa-137d-4054-b9b3-674e256f7a7e`
 - `ENTRA_CLIENT_ID`: `4f499ada-09c5-4a58-9c27-356250c69333`
 - Discovery URL: `https://login.microsoftonline.com/<tenantId>/v2.0/.well-known/openid-configuration`
+
+**IAM 権限**（`env.runtime.addToPolicy` で追加）:
+- `secretsmanager:GetSecretValue` — Tavily API キー / Google OAuth 読み取り
+- `ssm:GetParameter` — 起動時に `/mini-chat-app/gateway-endpoint` を取得
+- `bedrock-agentcore:*` — Code Interpreter / Browser ビルトインツール呼び出し
+
+**SSM 依存**（デプロイ前に各スタックが必要）:
+- `/mini-chat-app/cognito-user-pool-id`（CognitoStack）
+- `/mini-chat-app/cognito-client-id`（CognitoStack）
+- `/mini-chat-app/gateway-endpoint`（GatewayStack — Runtime 起動時に Python が読み込む）
 
 **出力**:
 - `RuntimeId`
@@ -219,3 +232,4 @@ npx cdk deploy MiniChatIdentityStack
 | 2026-04-29 | 初版作成 |
 | 2026-04-29 | RuntimeStack の JWT 認証を Cognito から Entra ID に変更。SSM 依存を削除 |
 | 2026-04-29 | MiniChatFrontendStack（Amplify Hosting）を追加。infra/frontend/ に CDK スタックを作成 |
+| 2026-04-29 | GatewayStack に SSM 出力を追加。RuntimeStack に SSM・bedrock-agentcore IAM 権限を追加 |

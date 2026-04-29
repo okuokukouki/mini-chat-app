@@ -13,12 +13,13 @@ from starlette.routing import Route
 
 from agents.agent import create_agent
 from agent.mcp.elicitation_bridge import ElicitationBridge, set_bridge, reset_bridge
+from config import ALLOWED_ORIGINS
 
 app = BedrockAgentCoreApp(
     middleware=[
         Middleware(
             CORSMiddleware,
-            allow_origins=["http://localhost:3000"],
+            allow_origins=ALLOWED_ORIGINS,
             allow_methods=["GET", "POST"],
             allow_headers=["*"],
         )
