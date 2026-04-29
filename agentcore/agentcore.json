@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "mini-chat-app",
+  "version": 1,
+  "managedBy": "CDK",
+  "tags": {
+    "agentcore:created-by": "agentcore-cli",
+    "agentcore:project-name": "mini-chat-app"
+  },
+  "runtimes": [
+    {
+      "name": "mini-chat-app",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": "agentcore/src/",
+      "runtimeVersion": "PYTHON_3_14",
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP",
+      "requestHeaderAllowlist": ["Authorization"],
+      "authorizerType": "CUSTOM_JWT"
+    }
+  ],
+  "memories": [],
+  "credentials": [
+    {
+      "authorizerType": "OAuthCredentialProvider",
+      "name": "gmail",
+      "vendor": "GoogleOauth2",
+      "scopes": ["https://www.googleapis.com/auth/gmail.readonly"]
+    }
+  ],
+  "evaluators": [],
+  "onlineEvalConfigs": [],
+  "agentCoreGateways": [],
+  "policyEngines": []
+}
