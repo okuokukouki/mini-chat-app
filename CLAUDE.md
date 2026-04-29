@@ -118,7 +118,8 @@ mini-chat-app/
 ├── infra/                   # CDK インフラ（共有 node_modules）
 │   ├── gateway/             # AgentCore Gateway（Tavily MCP Lambda）
 │   ├── runtime/             # AgentCore Runtime クラウドデプロイ
-│   └── identity/            # Cognito + AgentCore Identity（Gmail OAuth）
+│   ├── identity/            # Cognito + AgentCore Identity（Gmail OAuth）
+│   └── frontend/            # Amplify Hosting（Next.js フロントエンド）
 └── frontend/                # Next.js アプリ
     └── src/app/page.tsx     # チャット画面（OAuth ポップアップ対応）
 ```

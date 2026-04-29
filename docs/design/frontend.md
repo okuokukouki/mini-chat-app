@@ -208,30 +208,42 @@ sequenceDiagram
 
 ## Entra ID 認証フロー
 
+リダイレクト方式（`loginRedirect`）を採用。ポップアップではなくブラウザごとMicrosoftのログインページに遷移する。  
+Amplify にデプロイ済みのためリダイレクト URI が固定でき、リダイレクト方式が使えるようになった。
+
 ```mermaid
 sequenceDiagram
     participant User as ユーザー
-    participant FE as フロントエンド
+    participant FE as フロントエンド (Amplify)
     participant Entra as Entra ID
     participant RT as AgentCore Runtime
 
-    FE->>Entra: msalInstance.initialize()
+    Note over FE: ページロード時
+    FE->>FE: getMsalInstance() → initialize()
+    FE->>FE: handleRedirectPromise()\n（リダイレクト後の戻りを処理。通常ロード時は null）
     FE->>FE: getAllAccounts() で既存セッション復元
 
     User->>FE: 「Entra ID でログイン」ボタン押下
-    FE->>Entra: loginPopup({ scopes: ['openid','profile','email'] })
-    Entra-->>FE: AuthenticationResult（idToken 含む）
+    FE->>Entra: loginRedirect({ scopes })\n（ブラウザが Microsoft ログインページへ遷移）
+    Note over User,Entra: ユーザーが認証情報を入力
+    Entra->>FE: redirectUri（window.location.origin）にリダイレクト
+    Note over FE: ページ再ロード
+    FE->>FE: handleRedirectPromise() → AuthenticationResult
     FE->>FE: setAccount(result.account)
 
     User->>FE: チャット送信
     FE->>Entra: acquireTokenSilent({ account })
-    Entra-->>FE: idToken（JWT）
+    Entra-->>FE: idToken（JWT・キャッシュから返却）
     FE->>RT: POST /invocations\nAuthorization: Bearer <idToken>
     RT-->>FE: SSE ストリーム
+
+    Note over FE,Entra: トークン期限切れ時
+    FE->>Entra: acquireTokenRedirect({ account })\n（ページ遷移が発生・戻り後に自動で再取得）
 ```
 
-- MSAL インスタンスは `useRef` で保持（再レンダリングで再生成しない）
-- `acquireTokenSilent` 失敗時（`InteractionRequiredAuthError`）は自動で `loginPopup` にフォールバック
+- MSAL インスタンスは `useRef` + モジュールスコープのシングルトンで管理（StrictMode の二重実行に対応）
+- `acquireTokenSilent` 失敗時（`InteractionRequiredAuthError`）は `acquireTokenRedirect` にフォールバック
+- トークンは `sessionStorage` にキャッシュされ、リダイレクト往復後も維持される
 
 ---
 
@@ -251,3 +263,4 @@ sequenceDiagram
 |---|---|
 | 2026-04-29 | 初版作成 |
 | 2026-04-29 | Entra ID（MSAL）認証追加。Cognito 変数を Entra ID 変数に置き換え |
+| 2026-04-29 | 認証方式をポップアップ（loginPopup）からリダイレクト（loginRedirect）に変更。Amplify デプロイによりリダイレクト URI が固定化されたため |

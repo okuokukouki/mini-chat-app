@@ -23,12 +23,16 @@ infra/
 │   ├── bin/runtime.ts
 │   └── lib/
 │       └── runtime-stack.ts
-└── identity/            # Cognito + AgentCore Identity + DynamoDB
-    ├── bin/identity.ts
+├── identity/            # Cognito + AgentCore Identity + DynamoDB
+│   ├── bin/identity.ts
+│   └── lib/
+│       ├── cognito-stack.ts
+│       ├── secrets-stack.ts
+│       └── identity-stack.ts
+└── frontend/            # Amplify Hosting（Next.js フロントエンド）
+    ├── bin/frontend.ts
     └── lib/
-        ├── cognito-stack.ts
-        ├── secrets-stack.ts
-        └── identity-stack.ts
+        └── frontend-stack.ts
 ```
 
 ---
@@ -52,6 +56,10 @@ graph TD
         RS["MiniChatRuntimeStack\n(AgentCore Runtime + SSM)"]
     end
 
+    subgraph frontend["infra/frontend/"]
+        FS["MiniChatFrontendStack\n(Amplify Hosting)"]
+    end
+
     IS -->|"IAM ロール ARN"| GS
     CS -->|"SSM: user-pool-id"| IDS
     SS -->|"Secrets Manager 参照"| IDS
@@ -69,8 +77,9 @@ flowchart LR
     D["Step 4\nMiniChatSecretsStack\n(identity/)"] --> E
     E["Step 5\nMiniChatRuntimeStack\n(runtime/)"] --> F
     F["Step 6\nMiniChatIdentityStack\n(identity/)"] --> G
-    G["Step 7\nGoogle Cloud 設定\n(手動)"]
-    G --> H["Step 8\nSecrets Manager に\nOAuth 値を設定"]
+    G["Step 7\nMiniChatFrontendStack\n(frontend/)"] --> H
+    H["Step 8\nGoogle Cloud 設定\n(手動)"]
+    H --> I["Step 9\nSecrets Manager に\nOAuth 値を設定"]
 ```
 
 > Step 7 のみ Google Cloud Console での手動操作が必要（AWS 外部サービスのため）。
@@ -209,3 +218,4 @@ npx cdk deploy MiniChatIdentityStack
 |---|---|
 | 2026-04-29 | 初版作成 |
 | 2026-04-29 | RuntimeStack の JWT 認証を Cognito から Entra ID に変更。SSM 依存を削除 |
+| 2026-04-29 | MiniChatFrontendStack（Amplify Hosting）を追加。infra/frontend/ に CDK スタックを作成 |

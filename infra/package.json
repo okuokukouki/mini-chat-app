@@ -12,6 +12,7 @@
     "typescript": "~5.x"
   },
   "dependencies": {
+    "@aws-cdk/aws-amplify-alpha": "^2.251.0-alpha.0",
     "@aws/agentcore-cdk": "^0.1.0-alpha.22",
     "aws-cdk-lib": "^2.251.0",
     "constructs": "^10.0.0"
